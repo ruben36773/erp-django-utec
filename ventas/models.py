@@ -1,39 +1,23 @@
-from django.db import models
-
 # ventas/models.py
-"""Modelos de la app ventas — Espiral 2 W05.
-
-Modelos implementados:
-    Venta        — encabezado de una venta interna.
-    DetalleVenta — línea de producto dentro de una venta.
-    Pedido       — orden de compra del canal e-commerce (Espiral 5).
-
-Decisiones de diseño aplicadas:
-    D-03: Venta.cliente  → PROTECT.
-    D-04: Venta.total    → @property calculada, no campo de BD.
-    D-05: DetalleVenta.producto → PROTECT.
-    D-06: DetalleVenta.precio_unitario → almacenado (histórico).
-"""
+"""Modelos de la app ventas — Espiral 2 W06."""
 from decimal import Decimal
 
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 
-from clientes.models  import Cliente
+from clientes.models import Cliente
 from productos.models import Producto
 
 
 # ── Venta ─────────────────────────────────────────────────────────────────
 
 class Venta(models.Model):
-    """Encabezado de una venta interna.
-
-    El total no se almacena en la BD (D-04); se calcula
-    sumando los subtotales de cada DetalleVenta asociado.
-    """
+    """Encabezado de una venta interna."""
 
     cliente = models.ForeignKey(
         Cliente,
-        on_delete=models.PROTECT,      # D-03: no borrar cliente con ventas
+        on_delete=models.PROTECT,
         related_name='ventas',
         verbose_name='Cliente'
     )
@@ -51,39 +35,26 @@ class Venta(models.Model):
 
     @property
     def total(self) -> Decimal:
-        """Total de la venta: suma de subtotales de cada línea.
-
-        Decisión D-04: no se almacena en BD para cumplir 3FN.
-        Para dashboards con muchos registros, usar:
-            Venta.objects.annotate(total=Sum(...))
-
-        Returns:
-            Decimal: suma de (cantidad × precio_unitario) por línea.
-        """
         return sum(
             (d.subtotal for d in self.detalles.all()),
-            Decimal('0.00')        # valor inicial para venta sin detalles
+            Decimal('0.00')
         )
 
 
 # ── DetalleVenta ───────────────────────────────────────────────────────────
 
 class DetalleVenta(models.Model):
-    """Línea de producto dentro de una venta.
-
-    precio_unitario se almacena (D-06) porque el precio del producto
-    puede cambiar después de la venta; se necesita el histórico exacto.
-    """
+    """Línea de producto dentro de una venta."""
 
     venta           = models.ForeignKey(
         Venta,
-        on_delete=models.CASCADE,      # borrar Venta → borrar sus líneas
+        on_delete=models.CASCADE,
         related_name='detalles',
         verbose_name='Venta'
     )
     producto        = models.ForeignKey(
         Producto,
-        on_delete=models.PROTECT,      # D-05: no borrar producto con ventas
+        on_delete=models.PROTECT,
         related_name='detalles_venta',
         verbose_name='Producto'
     )
@@ -106,28 +77,25 @@ class DetalleVenta(models.Model):
 
     @property
     def subtotal(self) -> Decimal:
-        """Subtotal de la línea: cantidad × precio_unitario."""
         return self.precio_unitario * self.cantidad
 
     def save(self, *args, **kwargs) -> None:
-        """Captura el precio actual del producto si no se especificó.
-
-        Uso de 'is None' (no 'not') porque Decimal('0.00') es falsy
-        pero es un valor válido que NO debe sobreescribirse.
-        """
         if self.precio_unitario is None:
             self.precio_unitario = self.producto.precio
         super().save(*args, **kwargs)
+
+    def clean(self) -> None:
+        """Validación de negocio para línea de detalle."""
+        if self.cantidad is not None and self.cantidad < 1:
+            raise ValidationError(
+                {'cantidad': 'La cantidad debe ser al menos 1.'}
+            )
 
 
 # ── Pedido ─────────────────────────────────────────────────────────────────
 
 class Pedido(models.Model):
-    """Orden de compra del canal e-commerce.
-
-    Nota: se implementa en la Espiral 5 (W13–W15).
-    Se define aquí para completar el esquema ER aprobado.
-    """
+    """Orden de compra del canal e-commerce."""
 
     ESTADO_CHOICES = [
         ('pendiente',  'Pendiente de pago'),
@@ -162,10 +130,24 @@ class Pedido(models.Model):
         null=True, blank=True, verbose_name='Fecha de entrega'
     )
     total_pagado  = models.DecimalField(
-        max_digits=10, decimal_places=2,
-        null=True, blank=True,
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(Decimal('0.00'))],
         verbose_name='Total pagado'
     )
+
+    def clean(self) -> None:
+        """Valida que la fecha de entrega no sea anterior al pedido."""
+        if (self.fecha_entrega and self.fecha_pedido and
+                self.fecha_entrega < self.fecha_pedido.date()):
+            raise ValidationError({
+                'fecha_entrega': (
+                    'La fecha de entrega no puede ser anterior '
+                    'a la fecha del pedido.'
+                )
+            })
 
     class Meta:
         verbose_name        = 'Pedido'
