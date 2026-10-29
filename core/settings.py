@@ -95,7 +95,7 @@ STORAGES = {
 }
 
 # Almacenamiento estándar de WhiteNoise sin verificación estricta de manifiesto
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 WHITENOISE_MANIFEST_STRICT = False
 
 # ── Archivos media ────────────────────────────────────────────────────────
