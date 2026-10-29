@@ -84,9 +84,15 @@ USE_I18N      = True
 USE_TZ        = True
 
 # ── Archivos estáticos ────────────────────────────────────────────────────
-STATIC_URL  = '/static/'
+# Archivos estáticos
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Almacenamiento estándar de WhiteNoise sin verificación estricta de manifiesto
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
