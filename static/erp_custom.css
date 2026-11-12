@@ -25,30 +25,456 @@
     font-size: .9em;
 }
 
-/* ── JAZZMIN: Override de colores con Fable 5 AzulERP ─────────────────── */
+/* static/erp_custom.css
+   Utilidades adicionales de Fable 5 AzulERP.
+   Las variables CSS principales están definidas en base.html.
+*/
 
-/* Sidebar color navy */
-.main-sidebar, .sidebar { background-color: #0A2342 !important; }
+/* Tarjetas clicables en la bienvenida */
+.erp-module-card {
+    transition: transform .2s, box-shadow .2s;
+    cursor: pointer;
+}
+.erp-module-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
 
-/* Navbar color navy */
-.main-header.navbar { background-color: #0A2342 !important; }
+/* Utilidades de color */
+.text-gold   { color: var(--clr-gold)  !important; }
+.text-navy   { color: var(--clr-navy)  !important; }
+.bg-navy     { background: var(--clr-navy) !important; }
+.border-gold { border-color: var(--clr-gold) !important; }
 
-/* Brand / logo area */
-.brand-link { border-bottom: 1px solid #B8860B !important; }
-.brand-text  { color: #D4AF37 !important; font-weight: 700 !important; }
+/* Código monoespaciado */
+.font-mono {
+    font-family: 'JetBrains Mono', Consolas, monospace !important;
+    font-size: .9em;
+}
 
-/* Sidebar links */
-.nav-sidebar .nav-link { color: rgba(255,255,255,.82) !important; }
-.nav-sidebar .nav-link:hover,
-.nav-sidebar .nav-link.active {
-    background-color: #1B4F8A !important;
+/* ── JAZZMIN: PALETA NEON MAGENTA & DARK OBSIDIAN ── */
+
+/* static/erp_custom.css
+   Sobrescritura Total Jazzmin / AdminLTE 3 — Paleta Neon Magenta & Dark Obsidian (Versión Definitiva)
+*/
+
+/* ── 0. UTILIDADES BASE Y TARJETAS ERP ────────────────────────────────── */
+.erp-module-card {
+    transition: transform .2s, box-shadow .2s;
+    cursor: pointer;
+}
+.erp-module-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.text-gold   { color: var(--clr-gold)  !important; }
+.text-navy   { color: var(--clr-navy)  !important; }
+.bg-navy     { background: var(--clr-navy) !important; }
+.border-gold { border-color: var(--clr-gold) !important; }
+
+.font-mono {
+    font-family: 'JetBrains Mono', Consolas, monospace !important;
+    font-size: .9em;
+}
+
+/* ── 1. FRANJA HORIZONTAL DE TÍTULO Y VISTAS INTERNAS ─────────────────── */
+html,
+body,
+.wrapper,
+.content-wrapper,
+.content-wrapper > .content,
+.content-header,
+.content-header .container-fluid,
+.content-header .row,
+section.content,
+.container-fluid,
+#content,
+#content-main,
+#changelist,
+#changelist-form,
+.changelist-form-container,
+.change-form,
+.change-list,
+.results,
+.aligned,
+body.login-page,
+body.hold-transition {
+    background-color: #06030B !important; /* Obsidiana Profundo (#06030B) */
+    color: #F5EEFF !important;            /* Texto Blanco-Lavanda */
+}
+
+.content-header h1,
+.content-header .breadcrumb,
+.content-header .breadcrumb-item,
+.content-header .breadcrumb-item.active,
+.breadcrumb,
+.breadcrumb-item,
+.breadcrumb-item.active {
+    color: #F5EEFF !important;
+    background-color: transparent !important;
+}
+.content-header .breadcrumb-item a,
+.breadcrumb-item a {
+    color: #E879F9 !important;
+}
+
+/* ── 2. NAVBAR: BUSCADORES (LUPAS) Y PERFIL DE USUARIO ────────────────── */
+.main-header.navbar,
+.navbar-dark {
+    background-color: #0F091A !important;
+    border-bottom: 1.5px solid #D946EF !important;
+    color: #F5EEFF !important;
+}
+.navbar-dark .nav-link {
+    background-color: transparent !important;
+    border-bottom: none !important;
+    color: #F5EEFF !important;
+}
+
+/* Botón cuadrado con la lupa en los buscadores del navbar */
+.navbar .btn-navbar,
+.navbar .input-group-append .btn,
+.navbar .input-group-append .btn-navbar {
+    background-color: #180F2A !important;
+    border: 1.5px solid #D946EF !important;
+    border-left: none !important;
+    color: #E879F9 !important;
+}
+.navbar .btn-navbar:hover,
+.navbar .input-group-append .btn:hover {
+    background-color: #D946EF !important;
     color: #FFFFFF !important;
 }
 
-/* Accent: botones y badges en dorado */
-.accent-navy .nav-sidebar .nav-link.active {
-    background-color: #B8860B !important;
+/* Recuadro de perfil del usuario en la esquina superior derecha */
+.navbar-nav .nav-item,
+.navbar-nav .nav-item.dropdown,
+.navbar-nav .user-menu,
+.navbar-nav .user-menu .nav-link,
+.navbar-nav .user-menu a {
+    background-color: transparent !important;
+    background: transparent !important;
+    border-bottom: none !important;
+    color: #F5EEFF !important;
+}
+.navbar-nav .nav-link:hover {
+    color: #E879F9 !important;
 }
 
-/* Footer */
-.main-footer { border-top: 2px solid #B8860B; }
+/* Menú desplegable de perfil */
+.dropdown-menu,
+.dropdown-menu-lg {
+    background-color: #0F091A !important;
+    border: 1.5px solid #D946EF !important;
+    color: #F5EEFF !important;
+}
+.dropdown-item {
+    color: #F5EEFF !important;
+}
+.dropdown-item:hover,
+.dropdown-item:focus {
+    background-color: #1A0D2E !important;
+    color: #E879F9 !important;
+}
+
+/* ── 3. MENÚ LATERAL (SIDEBAR, LOGO Y ELEMENTO ACTIVO) ────────────────── */
+.main-sidebar,
+.main-sidebar[class*='sidebar-dark-'],
+.sidebar,
+.user-panel,
+.sidebar-dark-primary,
+.sidebar-dark-navy,
+.nav-treeview {
+    background-color: #0F091A !important;
+}
+
+.brand-link {
+    background-color: #1A0D2E !important;
+    border-bottom: 1.5px solid #D946EF !important;
+}
+.brand-text {
+    color: #E879F9 !important;
+    font-weight: 700 !important;
+}
+
+.user-panel {
+    border-bottom: 1px solid #2D144B !important;
+}
+.user-panel .info a,
+.user-panel .info {
+    color: #F5EEFF !important;
+    font-weight: 600 !important;
+}
+
+.nav-sidebar .nav-link {
+    color: #F5EEFF !important;
+}
+.nav-sidebar .nav-link:hover {
+    background-color: #1A0D2E !important;
+    color: #E879F9 !important;
+}
+
+/* Forzar magenta neón en el botón activo ("Panel de control", "Clientes", etc.) */
+.sidebar-dark-primary .nav-sidebar > .nav-item > .nav-link.active,
+.sidebar-dark-navy .nav-sidebar > .nav-item > .nav-link.active,
+.nav-sidebar .nav-item > a.nav-link.active,
+.nav-sidebar .nav-link.active,
+.nav-pills .nav-link.active,
+.nav-treeview > .nav-item > .nav-link.active,
+.nav-sidebar .menu-open > .nav-link {
+    background-color: #D946EF !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 0 12px rgba(217, 70, 239, 0.5) !important;
+    font-weight: 700 !important;
+}
+
+/* ── 4. LÍNEA DE TIEMPO (ACCIONES RECIENTES & RELOJ) ──────────────────── */
+.timeline > div > .timeline-item {
+    background-color: #0F091A !important;
+    color: #F5EEFF !important;
+    border: 1px solid #D946EF !important;
+    box-shadow: none !important;
+}
+.timeline-item .timeline-header {
+    color: #E879F9 !important;
+    border-bottom: 1px solid #2D144B !important;
+    font-weight: 600 !important;
+}
+.timeline-item .timeline-body,
+.timeline-item .time {
+    color: #C084FC !important;
+}
+
+/* Iconos de la línea de tiempo (incluyendo el reloj fa-clock) */
+.timeline > div > .fa-clock,
+.timeline > div > .fas,
+.timeline > div > .far,
+.timeline > div > .fab,
+.timeline > div > .svg-inline--fa,
+.timeline > div > i {
+    background-color: #D946EF !important;
+    color: #FFFFFF !important;
+    border-color: #D946EF !important;
+}
+
+/* ── 5. TARJETAS, TABLAS Y FILTROS DE LISTADO ─────────────────────────── */
+.card,
+#changelist-filter {
+    background-color: #0F091A !important;
+    border: 1.5px solid #D946EF !important;
+    color: #F5EEFF !important;
+}
+.card-body,
+.card-footer {
+    background-color: #0F091A !important;
+    color: #F5EEFF !important;
+}
+.card-header,
+#changelist-filter h2 {
+    background-color: #1A0D2E !important;
+    border-bottom: 1.5px solid #D946EF !important;
+    color: #E879F9 !important;
+    font-weight: 700 !important;
+}
+
+/* Tablas nativas y de listado */
+.card .table,
+.card .table tbody tr,
+.card .table td,
+.card .table th,
+#result_list,
+.results table,
+table.dataTable {
+    background-color: #0F091A !important;
+    color: #F5EEFF !important;
+    border-color: #2D144B !important;
+}
+#result_list thead th,
+.results table thead th {
+    background-color: #1A0D2E !important;
+    color: #E879F9 !important;
+    border-bottom: 2px solid #D946EF !important;
+}
+.card .table tbody tr:nth-of-type(odd) td,
+#result_list tbody tr:nth-of-type(odd) {
+    background-color: #180F2A !important;
+}
+#result_list tbody tr:nth-of-type(even) {
+    background-color: #0F091A !important;
+}
+#result_list tbody tr:hover {
+    background-color: #261240 !important;
+}
+
+/* Enlaces dentro de tablas */
+.card table a,
+.card .table td a,
+.content-wrapper a,
+.table a {
+    color: #E879F9 !important;
+    font-weight: 600 !important;
+}
+.card table a:hover,
+.card .table td a:hover,
+.content-wrapper a:hover,
+.table a:hover {
+    color: #F5EEFF !important;
+    text-decoration: underline !important;
+}
+
+/* Jerarquía de fechas y filtros laterales */
+.toplinks,
+.xfull,
+.date-hierarchy,
+.toplinks a {
+    color: #C084FC !important;
+}
+.toplinks .bold,
+.toplinks a.active,
+.toplinks a:hover {
+    color: #E879F9 !important;
+    font-weight: bold !important;
+}
+#changelist-filter ul,
+#changelist-filter li {
+    color: #F5EEFF !important;
+}
+#changelist-filter a {
+    color: #C084FC !important;
+}
+#changelist-filter li.selected a {
+    color: #E879F9 !important;
+    font-weight: bold !important;
+}
+
+/* ── 6. FORMULARIOS: INPUTS, SELECTS Y READONLY ───────────────────────── */
+.form-row,
+.form-group,
+fieldset,
+.module {
+    background-color: #0F091A !important;
+    border-color: #2D144B !important;
+    color: #F5EEFF !important;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+textarea,
+select,
+.vTextField,
+.vIntegerField,
+.vURLField,
+.vEmailField,
+.vDateField,
+.vTimeField,
+.form-control,
+.custom-select,
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+    background-color: #180F2A !important;
+    color: #F5EEFF !important;
+    border: 1.5px solid #D946EF !important;
+    border-radius: 6px !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus {
+    background-color: #1F1038 !important;
+    color: #FFFFFF !important;
+    border-color: #E879F9 !important;
+    box-shadow: 0 0 8px rgba(232, 121, 249, 0.5) !important;
+}
+
+.readonly,
+.field-readonly,
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background-color: #120A21 !important;
+    color: #C084FC !important;
+    border: 1px dashed #D946EF !important;
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+}
+
+label,
+.form-row label,
+.help,
+.help-block,
+span.clearable-file-input {
+    color: #F5EEFF !important;
+    font-weight: 500 !important;
+}
+
+/* ── 7. MEJORA DE CONTRASTE EN BOTONES Y TEXTOS ───────────────────────── */
+h1, h2, h3, h4, h5, h6,
+.text-dark {
+    color: #F5EEFF !important;
+}
+.text-muted,
+small {
+    color: #C084FC !important;
+}
+
+.btn-default,
+.btn-secondary {
+    background-color: #1A0D2E !important;
+    color: #F5EEFF !important;
+    border: 1px solid #D946EF !important;
+}
+.btn-default:hover,
+.btn-secondary:hover {
+    background-color: #D946EF !important;
+    color: #FFFFFF !important;
+}
+
+/* Botones "Agregar" y "Modificar" en tablas (máximo contraste) */
+.card .btn-xs,
+.card .btn-sm,
+.btn-info,
+.btn-warning {
+    color: #06030B !important; /* Texto Oscuro Obsidiana para contraste legible */
+    font-weight: 700 !important;
+}
+.btn-info {
+    background-color: #E879F9 !important;
+    border-color: #E879F9 !important;
+}
+.btn-warning {
+    background-color: #FACC15 !important;
+    border-color: #FACC15 !important;
+}
+
+/* Botones Principales (Guardar / Agregar principal) */
+.btn-primary,
+.btn-success {
+    background-color: #D946EF !important;
+    border-color: #D946EF !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+}
+.btn-primary:hover,
+.btn-success:hover {
+    background-color: #E879F9 !important;
+    border-color: #E879F9 !important;
+    color: #06030B !important;
+}
+
+/* ── 8. PIE DE PÁGINA ─────────────────────────────────────────────────── */
+.main-footer {
+    background-color: #0F091A !important;
+    border-top: 1.5px solid #D946EF !important;
+    color: #C084FC !important;
+}
+.main-footer a {
+    color: #E879F9 !important;
+}
