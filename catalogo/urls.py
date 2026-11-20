@@ -1,7 +1,7 @@
 
 # catalogo/urls.py — agregar la URL del webhook:
 from django.urls import path
-from django.views.decorators.csrf import csrf_exempt
+
 from . import views
 from .webhook_views import stripe_webhook
 
@@ -24,6 +24,6 @@ urlpatterns = [
     path('pago-error/',                 views.pago_error,  name='pago_error'),
 
     # Webhook de Stripe (W15)
-    path('webhook/', csrf_exempt(stripe_webhook), name='webhook'),
+    path('webhook/', stripe_webhook, name='webhook'),
 ]
 
