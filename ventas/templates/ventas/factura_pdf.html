@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Factura {{ pedido.numero_pedido|default:venta.pk }}</title>
+    <style>
+        /* ── Paleta Fable 5 AzulERP ─────────────────────────────────
+           WeasyPrint 60.x no resuelve var() dentro de propiedades
+           abreviadas (border, background), así que los colores van fijos:
+           navy #0A2342 · gold #B8860B · sky #4A90D9 · ice #E8F0FB
+           muted #5A6A7E · text #1A1A2E                              */
+
+        /* ── Configuración de página ──────────────────────────────── */
+        @page {
+            size: A4 portrait;
+            margin: 2cm 2cm 3cm 2cm;
+
+            /* Encabezado de empresa en cada página (excepto la primera) */
+            @top-left {
+                content: element(header-running);
+                margin-top: .5cm;
+            }
+
+            /* Número de página en el pie */
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-family: Arial, sans-serif;
+                font-size: 8.5pt;
+                color: #5A6A7E;
+                border-top: 1px solid #C8D8EC;
+                padding-top: .3cm;
+            }
+
+            /* Nombre de empresa en el pie izquierdo */
+            @bottom-left {
+                content: string(empresa-nombre);
+                font-family: Arial, sans-serif;
+                font-size: 8.5pt;
+                color: #5A6A7E;
+                border-top: 1px solid #C8D8EC;
+                padding-top: .3cm;
+            }
+        }
+
+        /* Primera página: sin encabezado (ya tiene el bloque header completo) */
+        @page :first {
+            @top-left { content: none; }
+        }
+
+        /* ── Reset base ─────────────────────────────────────────── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10.5pt;
+            color: #1A1A2E;
+            line-height: 1.5;
+        }
+
+        /* ── Elemento de running (encabezado en páginas 2+) ───────── */
+        #header-running {
+            position: running(header-running);
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #B8860B;
+            padding-bottom: .3cm;
+        }
+        #header-running .empresa { font-weight: bold; margin-right: 12px; color: #0A2342; }
+        #header-running .folio   { margin-left: auto; color: #B8860B; font-weight: bold; }
+
+        /* String para el pie izquierdo */
+        #empresa-string { string-set: empresa-nombre content(); }
+
+        /* ── ENCABEZADO (primera página) ───────────────────────────── */
+        .header {
+            background: #0A2342;
+            color: #FFFFFF;
+            padding: 18px 24px;
+            border-bottom: 4px solid #B8860B;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header-logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+            margin-right: 16px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.08);
+        }
+        .header-logo-placeholder {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background: rgba(255,255,255,.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-right: 16px;
+        }
+        .header-title { font-size: 22pt; font-weight: bold; color: #B8860B; }
+        .header-empresa { color: rgba(255,255,255,.78); font-size: 10pt; margin-top: 2px; }
+        .header-folio {
+            margin-left: auto;
+            text-align: right;
+        }
+        .header-folio .folio-num { font-size: 15pt; font-weight: bold; color: #B8860B; }
+        .header-folio .folio-fech { color: rgba(255,255,255,.68); font-size: 9pt; }
+
+        /* ── SECCIÓN DE DATOS DEL CLIENTE ──────────────────────────── */
+        .datos-section { margin-bottom: 18px; }
+        .datos-tabla {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .datos-tabla td {
+            padding: 5px 9px;
+            font-size: 9.5pt;
+            border: 1px solid #E8F0FB;
+        }
+        .datos-tabla .lbl {
+            background: #E8F0FB;
+            font-weight: bold;
+            color: #0A2342;
+            width: 28%;
+        }
+
+        /* ── TABLA DE PRODUCTOS ─────────────────────────────────────── */
+        .productos-tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            /* WeasyPrint: repetir thead en cada nueva página */
+            border-spacing: 0;
+        }
+        /* La propiedad que hace que WeasyPrint repita la cabecera */
+        thead { display: table-header-group; }
+        tfoot { display: table-footer-group; }
+
+        .productos-tabla thead th {
+            background: #0A2342;
+            color: #FFFFFF;
+            padding: 8px 11px;
+            font-size: 9pt;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            border-bottom: 3px solid #B8860B;
+        }
+        .productos-tabla thead th.num { text-align: right; }
+        .productos-tabla tbody td {
+            padding: 7px 11px;
+            font-size: 9.5pt;
+            border-bottom: 1px solid #E8F0FB;
+            /* Evitar cortar una fila entre dos páginas */
+            page-break-inside: avoid;
+        }
+        .productos-tabla tbody td.num { text-align: right; }
+        .productos-tabla tbody tr:nth-child(even) td { background: #F8FAFD; }
+
+        /* ── TOTALES ───────────────────────────────────────────────── */
+        .total-section { margin-top: 12px; }
+        .total-tabla { width: 50%; margin-left: 50%; border-collapse: collapse; }
+        .total-tabla td {
+            padding: 6px 10px;
+            font-size: 9.5pt;
+            border: 1px solid #E8F0FB;
+        }
+        .total-tabla .lbl {
+            background: #E8F0FB;
+            font-weight: bold;
+            color: #0A2342;
+        }
+        .total-tabla .val { text-align: right; }
+        .total-tabla tr.final td {
+            background: #FDF8E8;
+            border-top: 2px solid #B8860B;
+            font-weight: bold;
+            font-size: 11.5pt;
+        }
+        .total-tabla .val.gold { color: #B8860B; font-size: 12.5pt; }
+
+        /* ── NOTA LEGAL / PIE ─────────────────────────────────────── */
+        .nota {
+            margin-top: 24px;
+            padding: 12px 16px;
+            border-left: 4px solid #4A90D9;
+            background: #F5F9FF;
+            font-size: 8.5pt;
+            color: #5A6A7E;
+            /* No cortar la nota entre páginas */
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+<!--
+    Elemento de running: aparece en el encabezado de las páginas 2, 3, ...
+    WeasyPrint lo extrae del flujo normal y lo repite en @top-left de @page.
+-->
+<div id="header-running">
+    <span class="empresa">{{ config.nombre_empresa }}</span>
+    {% if config.rfc %}<span style="color:#5A6A7E;font-size:8.5pt;">RFC: {{ config.rfc }}</span>{% endif %}
+    <span class="folio">Factura #{{ venta.pk|stringformat:"05d" }}</span>
+</div>
+
+<!-- String invisible para el pie de página izquierdo -->
+<span id="empresa-string">{{ config.nombre_empresa }}</span>
+
+<!-- ── ENCABEZADO PRIMERA PÁGINA ───────────────────────────────── -->
+<div class="header">
+    {% if config.logo %}
+        <!--
+            base_url en weasyprint.HTML() resuelve esta URL relativa.
+            Sin base_url, WeasyPrint no encontraría el archivo de imagen.
+        -->
+        <img class="header-logo" src="{{ config.logo.url }}" alt="Logo">
+    {% else %}
+        <div class="header-logo-placeholder">ERP</div>
+    {% endif %}
+
+    <div>
+        <div class="header-title">FACTURA</div>
+        <div class="header-empresa">{{ config.nombre_empresa }}</div>
+        {% if config.rfc %}
+        <div class="header-empresa" style="font-size:9pt;">RFC: {{ config.rfc }}</div>
+        {% endif %}
+    </div>
+
+    <div class="header-folio">
+        <div class="folio-num"># {{ venta.pk|stringformat:"05d" }}</div>
+        <div class="folio-fech"> {{ venta.fecha|date:"d/m/Y" }}</div>
+    </div>
+</div>
+
+<!-- ── DATOS DEL CLIENTE ────────────────────────────────────────── -->
+<div class="datos-section">
+    <table class="datos-tabla">
+        <tr>
+            <td class="lbl">Cliente</td>
+            <td>{{ venta.cliente.nombre }}</td>
+            <td class="lbl">Correo</td>
+            <td>{{ venta.cliente.correo }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Teléfono</td>
+            <td>{{ venta.cliente.telefono|default:"—" }}</td>
+            <td class="lbl">Moneda</td>
+            <td>{{ config.moneda }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">Fecha de emisión</td>
+            <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+            <td class="lbl">IVA</td>
+            <td>{{ config.iva_porcentaje }}%</td>
+        </tr>
+    </table>
+</div>
+
+<!-- ── TABLA DE PRODUCTOS ────────────────────────────────────────── -->
+<table class="productos-tabla">
+    <thead>
+        <tr>
+            <th style="width:4%">#</th>
+            <th style="width:40%">Producto</th>
+            <th class="num" style="width:16%">Precio unit.</th>
+            <th class="num" style="width:10%">Cant.</th>
+            <th class="num" style="width:14%">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for detalle in venta.detalles.all %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ detalle.producto.nombre }}</td>
+            <td class="num">${{ detalle.precio_unitario }}</td>
+            <td class="num">{{ detalle.cantidad }}</td>
+            <td class="num">${{ detalle.subtotal }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align:center;padding:16px;color:#5A6A7E;">
+                Sin líneas de detalle registradas.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- ── TOTALES ───────────────────────────────────────────────────── -->
+<div class="total-section">
+    <table class="total-tabla">
+        {# subtotal, iva y total_con_iva vienen calculados desde la vista #}
+        <tr>
+            <td class="lbl">Subtotal (sin IVA)</td>
+            <td class="val">${{ subtotal }}</td>
+        </tr>
+        <tr>
+            <td class="lbl">IVA ({{ config.iva_porcentaje }}%)</td>
+            <td class="val">${{ iva }}</td>
+        </tr>
+        <tr class="final">
+            <td class="lbl" style="font-size:11.5pt;">TOTAL</td>
+            <td class="val gold">${{ total_con_iva }}</td>
+        </tr>
+    </table>
+</div>
+
+<!-- ── NOTA LEGAL ─────────────────────────────────────────────────── -->
+<div class="nota">
+    <strong>Nota:</strong> Este documento es una representación de la factura generada por
+    el sistema ERP Django de {{ config.nombre_empresa }}.
+    {% if config.rfc %}RFC: {{ config.rfc }}.{% endif %}
+    Generado el {{ hoy|date:"d/m/Y" }}.
+</div>
+
+</body>
+</html>
