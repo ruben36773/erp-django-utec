@@ -363,6 +363,11 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # ── CELERY BEAT — Tareas programadas ──────────────────────────────────────
 from celery.schedules import crontab
 
+# Hora del reporte diario (hora de México). Por defecto 8:00; se puede
+# cambiar desde Render con REPORTE_DIARIO_HORA y REPORTE_DIARIO_MINUTO.
+REPORTE_DIARIO_HORA   = env.int('REPORTE_DIARIO_HORA', default=8)       # NUEVO
+REPORTE_DIARIO_MINUTO = env.int('REPORTE_DIARIO_MINUTO', default=0)     # NUEVO
+
 CELERY_BEAT_SCHEDULE = {
 
     # Verificar stock bajo cada hora
@@ -373,10 +378,11 @@ CELERY_BEAT_SCHEDULE = {
         'options':  {'queue': 'erp_django'},
     },
 
-    # Reporte de ventas diario a las 8:00 AM (hora México)
+    # Reporte de ventas diario (hora México; por defecto 8:00 AM)
     'reporte-ventas-diario-8am': {
         'task':     'ventas.reporte_ventas_diario',
-        'schedule': crontab(hour=8, minute=0),
+        'schedule': crontab(hour=REPORTE_DIARIO_HORA,
+                            minute=REPORTE_DIARIO_MINUTO),               # CAMBIADO
         'options':  {'queue': 'erp_django'},
     },
 
