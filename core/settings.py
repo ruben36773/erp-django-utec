@@ -363,11 +363,11 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # ── CELERY BEAT — Tareas programadas ──────────────────────────────────────
 from celery.schedules import crontab
 
-# Hora del reporte diario (hora de México). Por defecto 8:00; se puede
-# cambiar desde Render con REPORTE_DIARIO_HORA y REPORTE_DIARIO_MINUTO.
-REPORTE_DIARIO_HORA   = env.int('REPORTE_DIARIO_HORA', default=8)       # NUEVO
-REPORTE_DIARIO_MINUTO = env.int('REPORTE_DIARIO_MINUTO', default=0)     # NUEVO
-
+# Acepta '19:28' (hora:minuto) o solo '19'
+_hora_txt = str(env('REPORTE_DIARIO_HORA', default='8')).strip()
+_h, _sep, _m = _hora_txt.partition(':')
+REPORTE_DIARIO_HORA   = int(_h)
+REPORTE_DIARIO_MINUTO = int(_m) if _m else env.int('REPORTE_DIARIO_MINUTO', default=0)
 CELERY_BEAT_SCHEDULE = {
 
     # Verificar stock bajo cada hora
